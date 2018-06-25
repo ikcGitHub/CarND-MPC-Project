@@ -170,6 +170,21 @@ int main() {
 
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
+		
+          /*****************************************************************************
+          *  Display MPC predicted trajectory in green line
+          ****************************************************************************/
+          // Loop through all the element in vars
+          // Skip the first x and y
+          for (unsigned int i = 2; i < vars.size(); i++) {
+            // If i is even number, then push the vars back to mpc_x_vals, otherwise,
+            // push them to mpc_y_vals.
+            if ( i % 2 ==0 ) {
+              mpc_x_vals.push_back( vars[i] );
+            } else {
+              mpc_y_vals.push_back( vars[i] );
+            }
+          }
 
           //Display the waypoints/reference line
           vector<double> next_x_vals;
@@ -180,7 +195,19 @@ int main() {
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
-
+          
+          /*****************************************************************************
+          *  Display references line in yellow line
+          ****************************************************************************/
+          // Loop through all the element in vars
+          // Skip the first x and y
+          double step_width = 2;
+          int n_step;
+          for (int i = 0; i < n_step; i++) {
+            double val_step = i * step_width;
+            next_x_vals.push_back( val_step );
+            next_y_vals.push_back( polyeval(coeffs, val_step) );
+          }
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
