@@ -98,13 +98,67 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-          double steer_value;
-          double throttle_value;
+          
+	        /*****************************************************************************
+          *  Transform coordinates
+          ****************************************************************************/
+          // TODO: Transform from map coordinates to car coordinates
+	        // Create vector for storing transformed observation measurements
+          Eigen::VectorXd vec_transformed_ptsx;
+          Eigen::VectorXd vec_transformed_ptsy;
+          
+          for (unsigned int i = 0; i < ptsx.size(); i++) {
+            double dx = ptsx[i] - px;
+            double dy = ptsy[i] - py;
+            vec_transformed_ptsx.push_back(dx * cos( -psi ) - dy * sin( -psi ));
+            vec_transformed_ptsy.push_back(dx * sin( -psi ) + dy * cos( -psi ));
+          }
+          
+          /*****************************************************************************
+          *  Fit polynomial
+          ****************************************************************************/
+          // TODO: fit a polynomial to the above x and y coordinates, 3rd order.
+          auto coeffs = polyfit(vec_transformed_ptsx, vec_transformed_ptsy, 3);
+          
+          /*****************************************************************************
+          *  Initial state vector
+          ****************************************************************************/
+          // TODO: initial state vector with delay
+          // Define actuator delay in seconds
+          double delay = 0.1;
+          
+          // Initial state vector
+          double x_0    = 0;
+          double y_0    = 0;
+          double psi_0  = 0;
+          double v_0    = v;
+          double cte_0  = coeffs[0];
+          double epsi_0 = -atan(coeffs[1]);
+          
+          // Initial state vector with delay
+          double x_delay    = x_0    + v_0 * cos( psi_0 ) * delay;
+          double y_delay    = y_0    + v_0 * sin( psi_0 ) * delay;
+          double psi_delay  = psi_0  - v_0 * j[1]["steering_angle"] * delay / mpc.Lf;
+          double v_delay    = v_0    + j[1]["throttle"] * delay;
+          double cte_delay  = cte_0  + v_0 * sin( epsi_0 ) * delay;
+          double epsi_delay = epsi_0 - v_0 * atan( coeffs[1] ) * delay / mpc.Lf;
+          
+          Eigen::VectorXd state(6);
+          state << x_delay, y_delay, psi_delay, v_delay, cte_delay, epsi_delay;
+          
+          /*****************************************************************************
+          *  Calculate the steering and throttle with MPC Solve()
+          ****************************************************************************/
+          // TODO: call MPC Solve() to get the steering angle and throttle position
+          auto vars = mpc.Solve(state, coeffs);
+          
+          double steer_value = vars[0];
+          double throttle_value = vars[1];
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = steer_value;
+          msgJson["steering_angle"] = steer_value/deg2rad(25);
           msgJson["throttle"] = throttle_value;
 
           //Display the MPC predicted trajectory 
@@ -139,7 +193,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          this_thread::sleep_for(chrono::milliseconds(100));
+          this_thread::sleep_for(chrono::milliseconds(delay * 1000));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
