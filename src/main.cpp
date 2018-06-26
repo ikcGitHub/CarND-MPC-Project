@@ -91,6 +91,8 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+		  double delta = j[1]["steering_angle"];
+		  double a = j[1]["throttle"];
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -99,19 +101,20 @@ int main() {
           *
           */
           
-	        /*****************************************************************************
+	      /*****************************************************************************
           *  Transform coordinates
           ****************************************************************************/
           // TODO: Transform from map coordinates to car coordinates
-	        // Create vector for storing transformed observation measurements
-          Eigen::VectorXd vec_transformed_ptsx;
-          Eigen::VectorXd vec_transformed_ptsy;
+	      // Create vector for storing transformed observation measurements
+		  const size_t n_ptsx = ptsx.size();
+		  auto Eigen::VectorXd vec_transformed_ptsx(n_ptsx);
+          auto Eigen::VectorXd vec_transformed_ptsy(n_ptsx);
           
-          for (unsigned int i = 0; i < ptsx.size(); i++) {
+          for (unsigned int i = 0; i < n_ptsx; i++) {
             double dx = ptsx[i] - px;
             double dy = ptsy[i] - py;
-            vec_transformed_ptsx.push_back(dx * cos( -psi ) - dy * sin( -psi ));
-            vec_transformed_ptsy.push_back(dx * sin( -psi ) + dy * cos( -psi ));
+            vec_transformed_ptsx(i) = dx * cos( -psi ) - dy * sin( -psi );
+            vec_transformed_ptsy(i) = dx * sin( -psi ) + dy * cos( -psi );
           }
           
           /*****************************************************************************
@@ -125,7 +128,8 @@ int main() {
           ****************************************************************************/
           // TODO: initial state vector with delay
           // Define actuator delay in seconds
-          double delay = 0.1;
+          const double delay_Sec = 0.1;
+		  const int delay_mSec = delay_Sec * 1000;
           
           // Initial state vector
           double x_0    = 0;
@@ -136,12 +140,12 @@ int main() {
           double epsi_0 = -atan(coeffs[1]);
           
           // Initial state vector with delay
-          double x_delay    = x_0    + v_0 * cos( psi_0 ) * delay;
-          double y_delay    = y_0    + v_0 * sin( psi_0 ) * delay;
-          double psi_delay  = psi_0  - v_0 * j[1]["steering_angle"] * delay / mpc.Lf;
-          double v_delay    = v_0    + j[1]["throttle"] * delay;
-          double cte_delay  = cte_0  + v_0 * sin( epsi_0 ) * delay;
-          double epsi_delay = epsi_0 - v_0 * atan( coeffs[1] ) * delay / mpc.Lf;
+          double x_delay    = x_0    + v_0 * cos( psi_0 ) * delay_Sec;
+          double y_delay    = y_0    + v_0 * sin( psi_0 ) * delay_Sec;
+          double psi_delay  = psi_0  - v_0 * delta * delay_Sec / mpc.Lf;
+          double v_delay    = v_0    + a * delay_Sec;
+          double cte_delay  = cte_0  + v_0 * sin( epsi_0 ) * delay_Sec;
+          double epsi_delay = epsi_0 - v_0 * atan( coeffs[1] ) * delay_Sec / mpc.Lf;
           
           Eigen::VectorXd state(6);
           state << x_delay, y_delay, psi_delay, v_delay, cte_delay, epsi_delay;
@@ -220,7 +224,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          this_thread::sleep_for(chrono::milliseconds(delay * 1000));
+          this_thread::sleep_for(chrono::milliseconds(delay_mSec));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {

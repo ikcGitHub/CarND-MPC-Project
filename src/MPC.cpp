@@ -19,7 +19,7 @@ double dt = 0.1;
 // presented in the classroom matched the previous radius.
 //
 // This is the length from front to CoG that has a similar radius.
-const double Lf = 2.67;
+//const double Lf = 2.67; // I move this declaration to the MPC.h
 
 /*****************************************************************************
 *  Define initial index
@@ -152,6 +152,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   //size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
+  /*****************************************************************************
+  *  Initial data
+  ****************************************************************************/
   // Extract data from state for better reading
   double x    = state[0];
   double y    = state[1];
@@ -172,6 +175,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Number of constraints
   size_t n_constraints = N * 6;
 
+  /*****************************************************************************
+  *  Set lower and upper bound
+  ****************************************************************************/
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
   Dvector vars(n_vars);
@@ -200,7 +206,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   
   // Acceleration/decceleration upper and lower limits.
   // NOTE: Feel free to change this to something else.
-  for (int i = a_start; i < n_vars; i++) {
+  for (unsigned int i = a_start; i < n_vars; i++) {
     vars_lowerbound[i] = -1.0;
     vars_upperbound[i] =  1.0;
   }
@@ -209,7 +215,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Should be 0 besides initial state.
   Dvector constraints_lowerbound(n_constraints);
   Dvector constraints_upperbound(n_constraints);
-  for (int i = 0; i < n_constraints; i++) {
+  for (unsigned int i = 0; i < n_constraints; i++) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
@@ -264,6 +270,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   auto cost = solution.obj_value;
   std::cout << "Cost " << cost << std::endl;
 
+  /*****************************************************************************
+  *  Return result
+  ****************************************************************************/
   // TODO: Return the first actuator values. The variables can be accessed with
   // `solution.x[i]`.
   //
@@ -274,7 +283,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   result.push_back(solution.x[delta_start]);
   result.push_back(solution.x[a_start]);
   
-  for (int i = 0; i < N - 1; i++) {
+  for (unsigned int i = 0; i < N - 1; i++) {
     result.push_back(solution.x[x_start + i + 1]);
     result.push_back(solution.x[y_start + i + 1]);
   }
