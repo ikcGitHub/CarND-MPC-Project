@@ -19,7 +19,7 @@ double dt = 0.1;
 // presented in the classroom matched the previous radius.
 //
 // This is the length from front to CoG that has a similar radius.
-//const double Lf = 2.67; // I move this declaration to the MPC.h
+const double Lf = 2.67;
 
 /*****************************************************************************
 *  Define initial index
