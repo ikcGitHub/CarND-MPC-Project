@@ -107,8 +107,8 @@ int main() {
           // TODO: Transform from map coordinates to car coordinates
 	      // Create vector for storing transformed observation measurements
 		  const size_t n_ptsx = ptsx.size();
-		  auto Eigen::VectorXd vec_transformed_ptsx(n_ptsx);
-          auto Eigen::VectorXd vec_transformed_ptsy(n_ptsx);
+		  auto vec_transformed_ptsx = Eigen::VectorXd(n_ptsx);
+          auto vec_transformed_ptsy = Eigen::VectorXd(n_ptsx);
           
           for (unsigned int i = 0; i < n_ptsx; i++) {
             double dx = ptsx[i] - px;
