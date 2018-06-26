@@ -206,7 +206,7 @@ int main() {
           // Loop through all the element in vars
           // Skip the first x and y
           double step_width = 2;
-          int n_step;
+          int n_step = 20;
           for (int i = 0; i < n_step; i++) {
             double val_step = i * step_width;
             next_x_vals.push_back( val_step );
