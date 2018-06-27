@@ -49,6 +49,9 @@ class FG_eval {
     /*****************************************************************************
    	*  Cost calculation
    	****************************************************************************/
+    // Initial cost
+    fg[0] = 0;
+
     // Add state cost
     // The part of the cost based on the reference state.
     for (unsigned int t = 0; t < N; t++) {
@@ -113,7 +116,7 @@ class FG_eval {
 	  AD<double> delta_t0 = vars[delta_start + t - 1];
 	  AD<double> a_t0 = vars[a_start + t - 1];
 	  AD<double> f_t0 = CppAD::pow(x_t0, 3) * coeffs[3] + CppAD::pow(x_t0, 2) * coeffs[2] + x_t0 * coeffs[1] + coeffs[0];
-	  AD<double> psi_des_t0 = CppAD::atan(CppAD::pow(x_t0, 2) * coeffs[3] * 3 + x_t0 * coeffs[2] * 2 + coeffs[1]);
+	  AD<double> psi_des_t0 = CppAD::atan(coeffs[1] + 2 * coeffs[2] * x_t0 + 3 * coeffs[3] * CppAD::pow(x_t0, 2));
       
       // Here's `x` to get you started.
       // The idea here is to constraint this value to be 0.
@@ -133,10 +136,10 @@ class FG_eval {
       // TODO: Setup the rest of the model constraints
 	  fg[1 + x_start + t] = x_t1 - (x_t0 + v_t0 * CppAD::cos(psi_t0) * dt);
 	  fg[1 + y_start + t] = y_t1 - (y_t0 + v_t0 * CppAD::sin(psi_t0) * dt);
-	  fg[1 + psi_start + t] = psi_t1 - (psi_t0 + v_t0 * delta_t0 / Lf * dt);
+	  fg[1 + psi_start + t] = psi_t1 - (psi_t0 - v_t0 * delta_t0 / Lf * dt);
 	  fg[1 + v_start + t] = v_t1 - (v_t0 + a_t0 * dt);
 	  fg[1 + cte_start + t] = cte_t1 - ((f_t0 - y_t0) + (v_t0 * CppAD::sin(epsi_t0) * dt));
-	  fg[1 + epsi_start + t] = epsi_t1 - ((psi_t0 - psi_des_t0) + (v_t0 * delta_t0 / Lf * dt));
+	  fg[1 + epsi_start + t] = epsi_t1 - ((psi_t0 - psi_des_t0) - (v_t0 * delta_t0 / Lf * dt));
     } 
   }
 };
