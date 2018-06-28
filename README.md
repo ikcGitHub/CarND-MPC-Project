@@ -1,6 +1,7 @@
 # CarND-Term2-P4-Model-Predictive-Control  
 ## Overview  
-(Need to fill)
+(Need to change)
+In this project you'll implement Model Predictive Control to drive the car around the track. This time however you're not given the cross track error, you'll have to calculate that yourself! Additionally, there's a 100 millisecond latency between actuations commands on top of the connection latency.
 
 ## Prerequisites/Dependencies  
 * cmake >= 3.5
@@ -41,9 +42,8 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 5. Build and run your code.  
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)  
 ## Project Description  
-(Need to change)
-- [main.cpp](./src/main.cpp):Reads in data, calls a function to initialize and run the PID controller on steering angle with tuned PID hyperparameters.  
-- [MPC.cpp](./src/ukf.cpp): Initializes the PID controller, calls the error update and total error calculation functions, defines the  `Init()`, `UpdateError()` and `TotalError()` functions.  
+- [main.cpp](./src/main.cpp):Reads in data, calls a function to initialize and run the model predictive controller on steering angle,  acceleration pedal and brake. Besides that, it will retrieve the predicted trajectory from the model predictive controller and propagate the line in front of the vehicle.  
+- [MPC.cpp](./src/ukf.cpp): Initializes the model predictive controller, define the cost calculation, set the contraints, process data and return actuator commands and predicted trajectory. Defines `FG_eval()` and `Solve()`.  
 - [README.md](./README.md): Writeup for this project, including setup, running instructions and project rubric addressing.  
 - [CMakeLists.txt](./CMakeLists.txt): `CMakeLists.txt` file that will be used when compiling your code (you do not need to change this file)
 ## Run the project  
@@ -68,28 +68,30 @@ is the vehicle starting offset of a straight line (reference). If the MPC implem
 Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
 
 ## Project Rubric  
-(Need to change)
 ### 1. Compilation  
 #### 1.1 Your code should compile.  
 Yes, it does.  
 ### 2. Implementation  
-#### 2.1 The PID procedure follows what was taught in the lessons.  
-Yes, it does.
-### 3. Reflection  
-#### 3.1 Describe the effect each of the P, I, D components had in your implementation.  
-P gain is proportional to the cross track error (CTE). It helps to compensate the error quickly.  
-I gain is the integral/sum of all the CTE. It helps to compensate the consistent bias.  
-D gain is the temporal derivative of the CTE. It helps to smooth the change.  
-#### 3.2 Describe how the final hyperparameters were chosen.  
-Firstly, I decided to try with PD controller. It works but fail eventually.  
-Then I tried with PID controller. And it continues fail and fail rapidly.  
-Therefore, I went back to PD controller and try more different PD parameters.  
-I noticed the steering angle changed like a spike which I should lower my P gain and increase my D gain to smooth the change.  
-After several try and error, I finally get the vehicle running smoothly in the autonomous mode in the simulater.  
-### 4. Simulation  
-#### 4.1 The vehicle must successfully drive a lap around the track.  
-Yes, it does. Please see the video below.  
+#### 2.1 The Model  
+Please see my notes/comments/documentation in [`MPC.cpp`](./src/MPC.cpp).  
+#### 2.2 Timestep Length and Elapsed Duration (N & dt)  
+Start with N = 25, dt = 0.05 then stawy with N = 10, dt = 0.1 at [`MPC.cpp` Line8-10](./src/MPC.cpp#L8-L10).  
+Because the latency is around 100 millisecond, setting dt = 0.1 can synchronize the laging.  
+As dt = 0.1, then N = 25 makes the prediction a little bit further but cause more calculation consumption.  
+Based on the speed (~55 mph) I have, 10 is good enough and 25 is not that bad.  
+#### 2.3 Polynomial Fitting and MPC Preprocessing  
+Polynomial fitting was called at [`main.cpp` Line120-124](./src/main.cpp#L120-L124).  
+Polynomial fitting was implemented at [`main.cpp` Line44-66](./src/main.cpp#L44-L66).  
+MPC preprocessing was implemented at [`main.cpp` Line104-118](./src/main.cpp#L104-L118).  
+#### 2.4 Model Predictive Control with Latency  
+The latency was handled at [`main.cpp` Line126-151](./src/main.cpp#L126-L151).  
+Also, one line changed at [`main.cpp` Line228](./src/main.cpp#L228).  
+### 3. Simulation  
+#### 3.1 The vehicle must successfully drive a lap around the track.  
+Yes, it does. Please see the videos below.  
 ## Videos
 Video recordings for success cases.  
-Success case for running my particle filter code.  
-![Successful running](./videos/CarND-Term2-P4-self_driving_car_nanodegree_program_6_23_2018_4_41_55_PM.gif)  
+Success case for smooth driving.  
+![Smooth_Driving](./videos/CarND-Term2-P5-Smooth-Driving_self_driving_car_nanodegree_program_6_27_2018_11_28_12_PM.gif)  
+Success case for highest speed driving with around 57 mph.  
+![Highest_Speed_Driving](./videos/CarND-Term2-P5-Highest-Speed_self_driving_car_nanodegree_program_6_27_2018_11_21_04_PM.gif)  
