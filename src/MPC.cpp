@@ -50,7 +50,7 @@ class FG_eval {
    	*  Cost calculation
    	****************************************************************************/
     // Initial reference velocity
-    const double v_ref = 150;
+    const double v_ref = 130;
 
     // Initial cost
     fg[0] = 0;
