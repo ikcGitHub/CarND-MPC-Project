@@ -58,23 +58,23 @@ class FG_eval {
     // Add state cost
     // The part of the cost based on the reference state.
     for (unsigned int t = 0; t < N; t++) {
-      fg[0] += 1000 * CppAD::pow(vars[cte_start  + t], 2);
-      fg[0] += 1000 * CppAD::pow(vars[epsi_start + t], 2);
+      fg[0] += 1500 * CppAD::pow(vars[cte_start  + t], 2);
+      fg[0] += 1500 * CppAD::pow(vars[epsi_start + t], 2);
       fg[0] += CppAD::pow(vars[v_start    + t] - v_ref, 2);
     }
     
     // Add actuator cost
     // Minimize the use of actuators.
     for (unsigned int t = 0; t < N - 1; t++) {
-      fg[0] += 50 * CppAD::pow(vars[delta_start + t], 2);
-      fg[0] += 50 * CppAD::pow(vars[a_start     + t], 2);
+      fg[0] += 100 * CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += 100 * CppAD::pow(vars[a_start     + t], 2);
     }
     
     // Add value gap cost
     // Minimize the value gap between sequential actuations.
     for (unsigned int t = 0; t < N - 2; t++) {
-      fg[0] += 250000 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      fg[0] += 5000 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      fg[0] += 300000 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      fg[0] += 3000 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
    
     /*****************************************************************************

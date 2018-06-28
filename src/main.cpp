@@ -195,24 +195,24 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
+		  /*****************************************************************************
+		  *  Display references line in yellow line
+		  ****************************************************************************/
+		  // Loop through all the element in vars
+		  // Skip the first x and y
+		  double step_width = 2;
+		  int n_step = 20;
+		  for (int i = 0; i < n_step; i++) {
+			  double val_step = i * step_width;
+			  next_x_vals.push_back(val_step);
+			  next_y_vals.push_back(polyeval(coeffs, val_step));
+		  }
+
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
-          
-          /*****************************************************************************
-          *  Display references line in yellow line
-          ****************************************************************************/
-          // Loop through all the element in vars
-          // Skip the first x and y
-          double step_width = 2;
-          int n_step = 20;
-          for (int i = 0; i < n_step; i++) {
-            double val_step = i * step_width;
-            next_x_vals.push_back( val_step );
-            next_y_vals.push_back( polyeval(coeffs, val_step) );
-          }
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
