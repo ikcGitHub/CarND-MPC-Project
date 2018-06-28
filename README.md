@@ -1,7 +1,8 @@
 # CarND-Term2-P4-Model-Predictive-Control  
 ## Overview  
-(Need to change)
-In this project you'll implement Model Predictive Control to drive the car around the track. This time however you're not given the cross track error, you'll have to calculate that yourself! Additionally, there's a 100 millisecond latency between actuations commands on top of the connection latency.
+In this project you'll implement model predictive controller to drive the car around the track. You will need to extract the data and calculate the cross track error then compute the appropriate steering angle and acceleration and feed them back to the simulator to drive the vehicle around the track. Besides that, you can also plot your predicted trajectory in front of the vehicle to see how well your model is working. Remember, there is a 100 millisecond latency between actuations commands on top of the connection latency so you will need to handle that latency in your code.  
+There is a simulator provided by Udacity ([Term 2 Simulator Release](https://github.com/udacity/self-driving-car-sim/releases/)) which will generate the state and actuator data. And you will be using those data to calculate the cross track error (CTE) then compute the appropriate control inputs then feed them back to the simulator to drive the vehicle.   
+Here is the link to the [orginal repository](https://github.com/udacity/CarND-MPC-Project) provided by Udaciy. This repository contains all the code needed to complete the final project for the Model Predictive Control course in Udacity's Self-Driving Car Nanodegree.
 
 ## Prerequisites/Dependencies  
 * cmake >= 3.5
@@ -42,7 +43,7 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 5. Build and run your code.  
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)  
 ## Project Description  
-- [main.cpp](./src/main.cpp):Reads in data, calls a function to initialize and run the model predictive controller on steering angle,  acceleration pedal and brake. Besides that, it will retrieve the predicted trajectory from the model predictive controller and propagate the line in front of the vehicle.  
+- [main.cpp](./src/main.cpp):Reads in data, calls a function to initialize and run the model predictive controller on steering angle,  acceleration pedal and brake. Besides that, it will also handle the 100 millisecond connection latency and retrieve the predicted trajectory from the model predictive controller and propagate the line in front of the vehicle.  
 - [MPC.cpp](./src/ukf.cpp): Initializes the model predictive controller, define the cost calculation, set the contraints, process data and return actuator commands and predicted trajectory. Defines `FG_eval()` and `Solve()`.  
 - [README.md](./README.md): Writeup for this project, including setup, running instructions and project rubric addressing.  
 - [CMakeLists.txt](./CMakeLists.txt): `CMakeLists.txt` file that will be used when compiling your code (you do not need to change this file)
