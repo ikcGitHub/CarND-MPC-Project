@@ -49,6 +49,9 @@ class FG_eval {
     /*****************************************************************************
    	*  Cost calculation
    	****************************************************************************/
+    // Initial reference velocity
+    const double v_ref = 80;
+
     // Initial cost
     fg[0] = 0;
 
@@ -57,7 +60,7 @@ class FG_eval {
     for (unsigned int t = 0; t < N; t++) {
       fg[0] += 1000 * CppAD::pow(vars[cte_start  + t], 2);
       fg[0] += 1000 * CppAD::pow(vars[epsi_start + t], 2);
-      fg[0] += CppAD::pow(vars[v_start    + t], 2);
+      fg[0] += CppAD::pow(vars[v_start    + t] - v_ref, 2);
     }
     
     // Add actuator cost
