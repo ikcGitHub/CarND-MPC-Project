@@ -1,4 +1,4 @@
-# CarND-Term2-P4-Model-Predictive-Control  
+# CarND-Term2-P5-Model-Predictive-Control  
 ## Overview  
 In this project you'll implement model predictive controller to drive the car around the track. You will need to extract the data and calculate the cross track error then compute the appropriate steering angle and acceleration and feed them back to the simulator to drive the vehicle around the track. Besides that, you can also plot your predicted trajectory in front of the vehicle to see how well your model is working. Remember, there is a 100 millisecond latency between actuations commands on top of the connection latency so you will need to handle that latency in your code.  
 There is a simulator provided by Udacity ([Term 2 Simulator Release](https://github.com/udacity/self-driving-car-sim/releases/)) which will generate the state and actuator data. And you will be using those data to calculate the cross track error (CTE) then compute the appropriate control inputs then feed them back to the simulator to drive the vehicle.   
