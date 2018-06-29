@@ -88,7 +88,7 @@ In conclusion, we will need to balance `N` and `dt` value for different purposes
 
 Our vehicle is assumed running as 50~80 mph for regular US high way speed limit.  
 Start with N = 25, dt = 0.05 then tried with different combinations.  
-Finally, I picked N = 10, dt = 0.1 at [`MPC.cpp` Line8-10](./src/MPC.cpp#L8-L10).  
+Finally, I picked N = 10, dt = 0.1 to have a better result at [`MPC.cpp` Line8-10](./src/MPC.cpp#L8-L10).  
 #### 2.3 Polynomial Fitting and MPC Preprocessing  
 Polynomial fitting was called at [`main.cpp` Line120-124](./src/main.cpp#L120-L124).  
 Polynomial fitting was implemented at [`main.cpp` Line44-66](./src/main.cpp#L44-L66).  
