@@ -76,17 +76,34 @@ Yes, it does.
 #### 2.1 The Model  
 Please see my notes/comments/documentation in [`MPC.cpp`](./src/MPC.cpp).  
 #### 2.2 Timestep Length and Elapsed Duration (N & dt)  
-Start with N = 25, dt = 0.05 then stawy with N = 10, dt = 0.1 at [`MPC.cpp` Line8-10](./src/MPC.cpp#L8-L10).  
-Because the latency is around 100 millisecond, setting dt = 0.1 can synchronize the laging.  
-As dt = 0.1, then N = 25 makes the prediction a little bit further but cause more calculation consumption.  
-Based on the speed (~55 mph) I have, 10 is good enough and 25 is not that bad.  
+The number of points(N) and the time step (dt) define the prediction horizon.  
+Larger `N` will consume more computational time which will affect the controller performance with no doubt.  
+Smaller `N` will have less computational time but the model will generate less points which might not suitable for high speed vehicle.  
+Larger `dt` will lower the accuracy of the predicition or mislead the prediction horizon.  
+Smaller `dt` will have higher solution but it mighy not necessary on a low speed vehicle.  
+Larger time horizon `N * dt` will generate a longer predicted path.  
+Smaller time horizon `N * dt` will genertate a shorter predicted path.  
+
+In conclusion, we will need to balance `N` and `dt` value for different purposes/metrics on our vehicle.  
+
+Our vehicle is assumed running as 50~80 mph for regular US high way speed limit.  
+Start with N = 25, dt = 0.05 then tried with different combinations.  
+Finally, I picked N = 10, dt = 0.1 at [`MPC.cpp` Line8-10](./src/MPC.cpp#L8-L10).  
 #### 2.3 Polynomial Fitting and MPC Preprocessing  
 Polynomial fitting was called at [`main.cpp` Line120-124](./src/main.cpp#L120-L124).  
 Polynomial fitting was implemented at [`main.cpp` Line44-66](./src/main.cpp#L44-L66).  
 MPC preprocessing was implemented at [`main.cpp` Line104-118](./src/main.cpp#L104-L118).  
+The model will transform the waypoints from map coordinates to car coordinates before polynomial fitting.  [`main.cpp` Line107](./src/main.cpp#L107).  
 #### 2.4 Model Predictive Control with Latency  
 The latency was handled at [`main.cpp` Line126-151](./src/main.cpp#L126-L151).  
 Also, one line changed at [`main.cpp` Line228](./src/main.cpp#L228).  
+
+The connectivity has a 100 millisecond latency.  
+Here, I defined the delay time as 0.1 second and 100 millisecond for different functions use. [`main.cpp` Line129-132](./src/main.cpp#L129-L132).  
+Then the state vector was initialized with the generated polynomial fitting coefficients. [`main.cpp` Line134-140](./src/main.cpp#L134-L140).  
+Next, the new state vector will be computed with the delay time. [`main.cpp` Line142-148](./src/main.cpp#L142-L148).  
+Finally, the new state vector was fed into the `mpc.Solve()` to get the new control inputs. [`main.cpp` Line157](./src/main.cpp#L157).  
+
 ### 3. Simulation  
 #### 3.1 The vehicle must successfully drive a lap around the track.  
 Yes, it does. Please see the videos below.  
